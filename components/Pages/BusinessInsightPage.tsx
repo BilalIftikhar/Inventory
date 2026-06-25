@@ -266,21 +266,21 @@ export default function BusinessInsightPage({
 
     // Price range distribution
     const priceRanges = [
-      { name: "$0-$100", min: 0, max: 100 },
-      { name: "$100-$500", min: 100, max: 500 },
-      { name: "$500-$1000", min: 500, max: 1000 },
-      { name: "$1000-$2000", min: 1000, max: 2000 },
-      { name: "$2000+", min: 2000, max: Infinity },
+      { name: "PKR 0-100", min: 0, max: 100 },
+      { name: "PKR 100-500", min: 100, max: 500 },
+      { name: "PKR 500-1000", min: 500, max: 1000 },
+      { name: "PKR 1000-2000", min: 1000, max: 2000 },
+      { name: "PKR 2000+", min: 2000, max: Infinity },
     ];
 
     const priceRangeDistribution = priceRanges.map((range) => ({
       name: range.name,
       value: filteredProducts.filter((product) => {
-        if (range.name === "$2000+") {
-          // For $2000+ range, include products > $2000 (not including $2000)
+        if (range.name === "PKR 2000+") {
+          // For PKR 2000+ range, include products > 2000 (not including 2000)
           return product.price > 2000;
-        } else if (range.name === "$1000-$2000") {
-          // For $1000-$2000 range, include products >= $1000 and <= $2000
+        } else if (range.name === "PKR 1000-2000") {
+          // For PKR 1000-2000 range, include products >= 1000 and <= 2000
           return product.price >= range.min && product.price <= range.max;
         } else {
           // For other ranges, include products >= min and < max (exclusive upper bound)
@@ -1084,8 +1084,14 @@ export default function BusinessInsightPage({
                             <Tooltip
                               formatter={(value) => [
                                 value != null
-                                  ? `$${Number(value).toLocaleString()}`
-                                  : "$0",
+                                  ? new Intl.NumberFormat("en-PK", {
+                                      style: "currency",
+                                      currency: "PKR",
+                                    }).format(Number(value))
+                                  : new Intl.NumberFormat("en-PK", {
+                                      style: "currency",
+                                      currency: "PKR",
+                                    }).format(0),
                                 "Revenue",
                               ]}
                             />
@@ -1170,8 +1176,14 @@ export default function BusinessInsightPage({
                           <Tooltip
                             formatter={(value) => [
                               value != null
-                                ? `$${Number(value).toLocaleString()}`
-                                : "$0",
+                                ? new Intl.NumberFormat("en-PK", {
+                                    style: "currency",
+                                    currency: "PKR",
+                                  }).format(Number(value))
+                                : new Intl.NumberFormat("en-PK", {
+                                    style: "currency",
+                                    currency: "PKR",
+                                  }).format(0),
                               "Value",
                             ]}
                           />
@@ -1228,8 +1240,14 @@ export default function BusinessInsightPage({
                           <Tooltip
                             formatter={(value) => [
                               value
-                                ? `$${Number(value).toLocaleString()}`
-                                : "$0",
+                                ? new Intl.NumberFormat("en-PK", {
+                                    style: "currency",
+                                    currency: "PKR",
+                                  }).format(Number(value))
+                                : new Intl.NumberFormat("en-PK", {
+                                    style: "currency",
+                                    currency: "PKR",
+                                  }).format(0),
                               "Value",
                             ]}
                             labelFormatter={(label) => `Product: ${label}`}
@@ -1332,7 +1350,10 @@ export default function BusinessInsightPage({
                     Average Price
                   </span>
                   <span className="font-semibold text-gray-900 dark:text-white">
-                    ${analyticsData.averagePrice.toFixed(2)}
+                    {new Intl.NumberFormat("en-PK", {
+                      style: "currency",
+                      currency: "PKR",
+                    }).format(analyticsData.averagePrice)}
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
@@ -1394,7 +1415,11 @@ export default function BusinessInsightPage({
                     Value Density
                   </span>
                   <span className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white">
-                    ${analyticsData.valueDensity.toFixed(2)} per product
+                    {new Intl.NumberFormat("en-PK", {
+                      style: "currency",
+                      currency: "PKR",
+                    }).format(analyticsData.valueDensity)}{" "}
+                    per product
                   </span>
                 </div>
               </div>
@@ -1430,8 +1455,8 @@ export default function BusinessInsightPage({
               </div>
               {aiInsightsUnavailable ? (
                 <p className="text-sm text-gray-600 dark:text-white/60">
-                  Configure OPENROUTER_API_KEY and/or GROQ_API_KEY in .env to enable AI-powered
-                  recommendations.
+                  Configure OPENROUTER_API_KEY and/or GROQ_API_KEY in .env to
+                  enable AI-powered recommendations.
                 </p>
               ) : aiInsightsText ? (
                 <div className="space-y-2">

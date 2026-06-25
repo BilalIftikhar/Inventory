@@ -3,7 +3,7 @@
  * Templates for order confirmations, invoices, shipping, and status updates
  * All templates support both HTML and plain text versions
  * Optimized for Gmail, Yahoo, Outlook compatibility
- * 
+ *
  * NOTE: These templates are ready to use once order/invoice systems are implemented
  */
 
@@ -34,7 +34,14 @@ function generateUniqueSubject(baseSubject: string): string {
  * @returns string - Formatted currency string
  */
 function formatCurrency(amount: number): string {
-  return `$${amount.toFixed(2)}`;
+  try {
+    return new Intl.NumberFormat("en-PK", {
+      style: "currency",
+      currency: "PKR",
+    }).format(amount);
+  } catch (err) {
+    return `PKR ${amount.toFixed(2)}`;
+  }
 }
 
 /**
@@ -45,7 +52,7 @@ function formatCurrency(amount: number): string {
  * @returns EmailContent - Email content with HTML and text versions
  */
 export function generateOrderConfirmationEmail(
-  data: OrderConfirmationData
+  data: OrderConfirmationData,
 ): EmailContent {
   const {
     orderNumber,
@@ -73,7 +80,7 @@ export function generateOrderConfirmationEmail(
           <td style="padding: 12px; border-bottom: 1px solid #eeeeee; color: #666666; text-align: right;">${formatCurrency(item.price)}</td>
           <td style="padding: 12px; border-bottom: 1px solid #eeeeee; color: #333333; text-align: right; font-weight: 600;">${formatCurrency(item.subtotal)}</td>
         </tr>
-      `
+      `,
     )
     .join("");
 
@@ -209,7 +216,8 @@ export function generateOrderConfirmationEmail(
 
   const itemsText = items
     .map(
-      (item) => `- ${item.productName} (Qty: ${item.quantity}) - ${formatCurrency(item.price)} each = ${formatCurrency(item.subtotal)}`
+      (item) =>
+        `- ${item.productName} (Qty: ${item.quantity}) - ${formatCurrency(item.price)} each = ${formatCurrency(item.subtotal)}`,
     )
     .join("\n");
 
@@ -271,7 +279,9 @@ export function generateInvoiceEmail(data: InvoiceEmailData): EmailContent {
     status,
   } = data;
 
-  const subject = generateUniqueSubject(`Invoice ${invoiceNumber}${status === "overdue" ? " - Payment Overdue" : ""}`);
+  const subject = generateUniqueSubject(
+    `Invoice ${invoiceNumber}${status === "overdue" ? " - Payment Overdue" : ""}`,
+  );
 
   // Generate items table rows
   const itemsRows = items
@@ -283,7 +293,7 @@ export function generateInvoiceEmail(data: InvoiceEmailData): EmailContent {
           <td style="padding: 12px; border-bottom: 1px solid #eeeeee; color: #666666; text-align: right;">${formatCurrency(item.unitPrice)}</td>
           <td style="padding: 12px; border-bottom: 1px solid #eeeeee; color: #333333; text-align: right; font-weight: 600;">${formatCurrency(item.subtotal)}</td>
         </tr>
-      `
+      `,
     )
     .join("");
 
@@ -291,10 +301,10 @@ export function generateInvoiceEmail(data: InvoiceEmailData): EmailContent {
     status === "paid"
       ? "#27ae60"
       : status === "overdue"
-      ? "#e74c3c"
-      : status === "sent"
-      ? "#3498db"
-      : "#95a5a6";
+        ? "#e74c3c"
+        : status === "sent"
+          ? "#3498db"
+          : "#95a5a6";
 
   const htmlContent = `
 <!DOCTYPE html>
@@ -456,7 +466,8 @@ export function generateInvoiceEmail(data: InvoiceEmailData): EmailContent {
 
   const itemsText = items
     .map(
-      (item) => `- ${item.description} (Qty: ${item.quantity}) - ${formatCurrency(item.unitPrice)} each = ${formatCurrency(item.subtotal)}`
+      (item) =>
+        `- ${item.description} (Qty: ${item.quantity}) - ${formatCurrency(item.unitPrice)} each = ${formatCurrency(item.subtotal)}`,
     )
     .join("\n");
 
@@ -502,7 +513,7 @@ This is an automated email from Stock Inventory Management. Please do not reply 
  * @returns EmailContent - Email content with HTML and text versions
  */
 export function generateShippingNotificationEmail(
-  data: ShippingNotificationData
+  data: ShippingNotificationData,
 ): EmailContent {
   const {
     orderNumber,
@@ -516,7 +527,9 @@ export function generateShippingNotificationEmail(
     trackingUrl,
   } = data;
 
-  const subject = generateUniqueSubject(`Your Order ${orderNumber} Has Shipped`);
+  const subject = generateUniqueSubject(
+    `Your Order ${orderNumber} Has Shipped`,
+  );
 
   const htmlContent = `
 <!DOCTYPE html>
@@ -591,7 +604,7 @@ export function generateShippingNotificationEmail(
                       <td style="padding: 12px; border-bottom: 1px solid #eeeeee; color: #333333;">${item.productName}</td>
                       <td style="padding: 12px; border-bottom: 1px solid #eeeeee; color: #666666; text-align: right;">Quantity: ${item.quantity}</td>
                     </tr>
-                  `
+                  `,
                     )
                     .join("")}
                 </table>
@@ -673,7 +686,7 @@ This is an automated email from Stock Inventory Management. Please do not reply 
  * @returns EmailContent - Email content with HTML and text versions
  */
 export function generateOrderStatusUpdateEmail(
-  data: OrderStatusUpdateData
+  data: OrderStatusUpdateData,
 ): EmailContent {
   const {
     orderNumber,
@@ -685,7 +698,9 @@ export function generateOrderStatusUpdateEmail(
     estimatedDelivery,
   } = data;
 
-  const subject = generateUniqueSubject(`Order ${orderNumber} Status Update: ${newStatus}`);
+  const subject = generateUniqueSubject(
+    `Order ${orderNumber} Status Update: ${newStatus}`,
+  );
 
   // Status color mapping
   const statusColors: Record<string, string> = {

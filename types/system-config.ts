@@ -116,7 +116,7 @@ export const DEFAULT_CONFIGS: Omit<
   },
   {
     key: "currency",
-    value: "USD",
+    value: "PKR",
     type: "string",
     label: "Currency",
     description: "Default currency for prices and transactions",

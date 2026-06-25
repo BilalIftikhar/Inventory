@@ -166,8 +166,7 @@ export async function POST(request: NextRequest) {
       // We use DEFAULT_FROM_ADDRESS / .env for certify signer and origin.
       // Shippo requires: combined weight of all customs items <= parcel weight.
       const baseParcelWeight = parcel?.weight || "2";
-      const totalQty =
-        order.items.reduce((sum, i) => sum + i.quantity, 0) || 1;
+      const totalQty = order.items.reduce((sum, i) => sum + i.quantity, 0) || 1;
       const parcelWeightNum = parseFloat(baseParcelWeight) || 2;
 
       let customsDeclarationId: string | undefined;
@@ -191,7 +190,7 @@ export async function POST(request: NextRequest) {
                 netWeight: weightPerItemStr,
                 massUnit: "lb" as const,
                 valueAmount: item.subtotal.toFixed(2),
-                valueCurrency: "USD" as const,
+                valueCurrency: "PKR" as const,
                 originCountry: "US" as const,
               }))
             : [
@@ -201,7 +200,7 @@ export async function POST(request: NextRequest) {
                   netWeight: baseParcelWeight,
                   massUnit: "lb" as const,
                   valueAmount: order.subtotal.toFixed(2),
-                  valueCurrency: "USD" as const,
+                  valueCurrency: "PKR" as const,
                   originCountry: "US" as const,
                 },
               ];

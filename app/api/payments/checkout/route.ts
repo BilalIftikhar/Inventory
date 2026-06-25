@@ -64,6 +64,10 @@ export async function POST(request: NextRequest) {
       };
       quantity: number;
     }[] = [];
+    const currencyFormatter = new Intl.NumberFormat("en-PK", {
+      style: "currency",
+      currency: "PKR",
+    });
     const metadata: Record<string, string> = {
       type,
       referenceId: id,
@@ -85,8 +89,7 @@ export async function POST(request: NextRequest) {
       const isClient = session.role === "client";
       const isCreator = order.userId === session.id;
       const isOrderClient = order.clientId === session.id;
-      const canCheckout =
-        isCreator || (isClient && isOrderClient);
+      const canCheckout = isCreator || (isClient && isOrderClient);
 
       if (!canCheckout) {
         return NextResponse.json(
@@ -116,18 +119,22 @@ export async function POST(request: NextRequest) {
           );
         }
         const parts: string[] = [];
-        if (order.subtotal) parts.push(`Subtotal $${order.subtotal.toFixed(2)}`);
-        if (order.tax && order.tax > 0) parts.push(`Tax $${order.tax.toFixed(2)}`);
+        if (order.subtotal)
+          parts.push(`Subtotal ${currencyFormatter.format(order.subtotal)}`);
+        if (order.tax && order.tax > 0)
+          parts.push(`Tax ${currencyFormatter.format(order.tax)}`);
         if (order.shipping && order.shipping > 0)
-          parts.push(`Shipping $${order.shipping.toFixed(2)}`);
-        parts.push(`Discount -$${order.discount.toFixed(2)}`);
+          parts.push(`Shipping ${currencyFormatter.format(order.shipping)}`);
+        parts.push(`Discount -${currencyFormatter.format(order.discount)}`);
         lineItems = [
           {
             price_data: {
-              currency: "usd",
+              currency: "pkr",
               product_data: {
                 name: `Order ${order.orderNumber}`,
-                description: parts.join(" · ") + ` → Total $${order.total.toFixed(2)}`,
+                description:
+                  parts.join(" · ") +
+                  ` → Total ${currencyFormatter.format(order.total)}`,
               },
               unit_amount: totalCents,
             },
@@ -137,7 +144,7 @@ export async function POST(request: NextRequest) {
       } else {
         lineItems = order.items.map((item) => ({
           price_data: {
-            currency: "usd",
+            currency: "pkr",
             product_data: {
               name: item.productName,
               description: item.sku ? `SKU: ${item.sku}` : undefined,
@@ -149,7 +156,7 @@ export async function POST(request: NextRequest) {
         if (order.tax && order.tax > 0) {
           lineItems.push({
             price_data: {
-              currency: "usd",
+              currency: "pkr",
               product_data: { name: "Tax" },
               unit_amount: Math.round(order.tax * 100),
             },
@@ -159,7 +166,7 @@ export async function POST(request: NextRequest) {
         if (order.shipping && order.shipping > 0) {
           lineItems.push({
             price_data: {
-              currency: "usd",
+              currency: "pkr",
               product_data: { name: "Shipping" },
               unit_amount: Math.round(order.shipping * 100),
             },
@@ -198,8 +205,7 @@ export async function POST(request: NextRequest) {
       const isClient = session.role === "client";
       const isCreator = invoice.userId === session.id;
       const isInvoiceClient = invoice.clientId === session.id;
-      const canCheckout =
-        isCreator || (isClient && isInvoiceClient);
+      const canCheckout = isCreator || (isClient && isInvoiceClient);
 
       if (!canCheckout) {
         return NextResponse.json(
@@ -222,7 +228,7 @@ export async function POST(request: NextRequest) {
       lineItems = [
         {
           price_data: {
-            currency: "usd",
+            currency: "pkr",
             product_data: {
               name: `Invoice ${invoice.invoiceNumber}`,
               description: `Payment for invoice ${invoice.invoiceNumber}`,

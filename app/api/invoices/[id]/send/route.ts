@@ -45,7 +45,9 @@ export async function POST(
     // Admin can send any invoice; other roles only their own.
     let ownerUserId = userId;
     if (isAdmin) {
-      const existing = await prisma.invoice.findUnique({ where: { id: invoiceId } });
+      const existing = await prisma.invoice.findUnique({
+        where: { id: invoiceId },
+      });
       if (existing) ownerUserId = existing.userId;
     }
 
@@ -100,16 +102,20 @@ export async function POST(
         const baseUrl =
           process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 
+        const currencyFormatter = new Intl.NumberFormat("en-PK", {
+          style: "currency",
+          currency: "PKR",
+        });
         const checkoutSession = await stripe.checkout.sessions.create({
           payment_method_types: ["card"],
           line_items: [
             {
               price_data: {
-                currency: "usd",
+                currency: "pkr",
                 unit_amount: Math.round(invoice.amountDue * 100), // Stripe uses cents
                 product_data: {
                   name: `Invoice ${invoice.invoiceNumber}`,
-                  description: `Payment for order ${order.orderNumber}`,
+                  description: `Payment for order ${order.orderNumber} — ${currencyFormatter.format(invoice.amountDue)}`,
                 },
               },
               quantity: 1,
