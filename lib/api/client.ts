@@ -96,10 +96,15 @@ export interface ApiResponse<T> {
 /** Builds Axios instance with baseURL (/api), credentials, and request/response interceptors. */
 function createAxiosInstance(): AxiosInstance {
   const instance = axios.create({
+    // Prefer explicit runtime env `NEXT_PUBLIC_API_URL` (set in Vercel or .env).
+    // In production default to same-origin `/api` so the frontend and API
+    // calls stay on the current host. This prevents accidental cross-origin
+    // requests to the old demo host (stockly-inventory.vercel.app).
     baseURL:
-      process.env.NODE_ENV === "production"
-        ? "https://stockly-inventory.vercel.app/api"
-        : "http://localhost:3000/api",
+      process.env.NEXT_PUBLIC_API_URL ||
+      (process.env.NODE_ENV === "production"
+        ? "/api"
+        : "http://localhost:3000/api"),
     headers: {
       "Content-Type": "application/json",
     },
