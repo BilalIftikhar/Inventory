@@ -7,11 +7,16 @@ const defaultEmail = "test@adminafnan.com";
 const defaultName = "Test Admin";
 const defaultPassword = "admin@afnan000";
 
-function parseArg(name: string, fallback: string) {
+function parseArg(name: string, fallback: string): string {
   const flag = process.argv.find((arg) => arg.startsWith(`--${name}=`));
   if (flag) return flag.slice(flag.indexOf("=") + 1);
   const idx = process.argv.indexOf(`--${name}`);
-  if (idx !== -1 && process.argv[idx + 1]) return process.argv[idx + 1];
+  if (idx !== -1) {
+    const nextArg = process.argv[idx + 1];
+    if (typeof nextArg === "string" && nextArg.length > 0) {
+      return nextArg;
+    }
+  }
   return fallback;
 }
 
