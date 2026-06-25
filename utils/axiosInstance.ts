@@ -3,9 +3,10 @@ import Cookies from "js-cookie";
 
 const axiosInstance = axios.create({
   baseURL:
-    process.env.NODE_ENV === "production"
-      ? "https://stockly-inventory.vercel.app/api" // Production URL
-      : "http://localhost:3000/api", // Localhost for development
+    process.env.NEXT_PUBLIC_API_URL ||
+    (process.env.NODE_ENV === "production"
+      ? "/api"
+      : "http://localhost:3000/api"),
   headers: {
     "Content-Type": "application/json",
   },

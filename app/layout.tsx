@@ -76,7 +76,7 @@ export const metadata = {
     other: [{ rel: "icon", url: "/favicon.ico" }],
   },
   metadataBase: new URL(
-    process.env.NEXT_PUBLIC_APP_URL ?? "https://stockly-inventory.vercel.app",
+    process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000",
   ),
   openGraph: {
     type: "website",
@@ -84,7 +84,7 @@ export const metadata = {
     title: "Stockly — Warehouse & Stock Inventory Management System",
     description:
       "Efficiently manage products, orders, invoices, and warehouses with Stockly. Secure, responsive, role-based inventory system. By Arnob Mahmud.",
-    url: "https://stockly-inventory.vercel.app",
+    url: process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000",
     siteName: "Stockly",
     images: [
       {

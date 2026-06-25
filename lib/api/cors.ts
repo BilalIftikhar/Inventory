@@ -7,9 +7,10 @@
 import type { NextRequest } from "next/server";
 
 /**
- * Production URL
+ * Production URL (set via NEXT_PUBLIC_APP_URL in Vercel)
+ * Falls back to empty string when not provided so same-origin requests work.
  */
-const PRODUCTION_URL = "https://stockly-inventory.vercel.app";
+const PRODUCTION_URL = process.env.NEXT_PUBLIC_APP_URL || "";
 
 /**
  * Check if an origin is allowed for CORS
@@ -20,8 +21,8 @@ const PRODUCTION_URL = "https://stockly-inventory.vercel.app";
 export function isAllowedOrigin(origin: string | null): boolean {
   if (!origin) return false;
 
-  // Allow production URL
-  if (origin === PRODUCTION_URL) {
+  // Allow configured production app URL when provided
+  if (PRODUCTION_URL && origin === PRODUCTION_URL) {
     return true;
   }
 
@@ -46,7 +47,7 @@ export function getAllowedOrigin(origin: string | null): string {
   if (origin && isAllowedOrigin(origin)) {
     return origin;
   }
-  return PRODUCTION_URL;
+  return PRODUCTION_URL || origin || "";
 }
 
 /**
@@ -61,7 +62,7 @@ export function createCorsHeaders(request: NextRequest): Headers {
   headers.set("Access-Control-Allow-Origin", getAllowedOrigin(origin));
   headers.set(
     "Access-Control-Allow-Methods",
-    "GET, POST, PUT, DELETE, OPTIONS"
+    "GET, POST, PUT, DELETE, OPTIONS",
   );
   headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
   headers.set("Access-Control-Allow-Credentials", "true");
