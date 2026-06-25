@@ -7,7 +7,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiClient, getErrorMessage, isAuthError } from "@/lib/api";
 import { queryKeys, invalidateAllRelatedQueries } from "@/lib/react-query";
 import { useToast } from "@/hooks/use-toast";
-import type { LoginInput, RegisterInput, LoginResponse } from "@/types";
+import type { LoginInput, LoginResponse } from "@/types";
 
 /**
  * Get current session
@@ -68,37 +68,6 @@ export function useLogin() {
 }
 
 /**
- * Register mutation
- * Mutation hook for user registration
- */
-export function useRegister() {
-  const queryClient = useQueryClient();
-  const { toast } = useToast();
-
-  return useMutation({
-    mutationFn: async (data: RegisterInput) => {
-      const response = await apiClient.auth.register(data);
-      return response.data;
-    },
-    onSuccess: (user) => {
-      invalidateAllRelatedQueries(queryClient);
-      toast({
-        title: "Success",
-        description: "Account created successfully",
-      });
-      return user;
-    },
-    onError: (error) => {
-      toast({
-        title: "Error",
-        description: getErrorMessage(error),
-        variant: "destructive",
-      });
-    },
-  });
-}
-
-/**
  * Logout mutation
  * Mutation hook for user logout
  */
@@ -127,4 +96,3 @@ export function useLogout() {
     },
   });
 }
-

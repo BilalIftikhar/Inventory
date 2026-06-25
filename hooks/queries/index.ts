@@ -150,7 +150,7 @@ export {
 } from "./use-portal";
 
 // Auth hooks
-export { useSession, useLogin, useRegister, useLogout } from "./use-auth";
+export { useSession, useLogin, useLogout } from "./use-auth";
 
 // Payment hooks
 export { useCreateCheckout } from "./use-payments";

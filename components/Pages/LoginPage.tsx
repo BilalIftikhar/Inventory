@@ -243,18 +243,6 @@ export default function LoginPage() {
                   )}
                 </Button>
               </form>
-
-              <div className="text-center text-sm">
-                <p className="text-gray-600 dark:text-white/70">
-                  Don&apos;t have an account?{" "}
-                  <Link
-                    href="/register"
-                    className="text-sky-600 dark:text-sky-400 hover:text-sky-700 dark:hover:text-sky-300 transition-colors font-medium"
-                  >
-                    Sign up
-                  </Link>
-                </p>
-              </div>
             </div>
           </div>
         </div>

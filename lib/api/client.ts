@@ -28,7 +28,6 @@ import type {
   CreateSupplierInput,
   UpdateSupplierInput,
   LoginInput,
-  RegisterInput,
   LoginResponse,
   EmailPreferences,
   UpdateEmailPreferencesInput,
@@ -161,24 +160,6 @@ class ApiClient {
         API_ENDPOINTS.auth.login,
         data,
       );
-      return {
-        data: response.data,
-        status: response.status,
-        statusText: response.statusText,
-      };
-    },
-
-    /**
-     * Register new user
-     */
-    register: async (
-      data: RegisterInput,
-    ): Promise<ApiResponse<{ id: string; name: string; email: string }>> => {
-      const response = await this.client.post<{
-        id: string;
-        name: string;
-        email: string;
-      }>(API_ENDPOINTS.auth.register, data);
       return {
         data: response.data,
         status: response.status,
@@ -980,9 +961,7 @@ class ApiClient {
       };
     },
 
-    getClientCatalog: async (): Promise<
-      ApiResponse<ClientCatalogOverview>
-    > => {
+    getClientCatalog: async (): Promise<ApiResponse<ClientCatalogOverview>> => {
       const response = await this.client.get<ClientCatalogOverview>(
         API_ENDPOINTS.portal.clientCatalog,
       );
@@ -1004,9 +983,11 @@ class ApiClient {
       };
     },
 
-    getClientBrowseProducts: async (
-      params: { ownerId: string; supplierId?: string; categoryId?: string },
-    ): Promise<ApiResponse<ClientBrowseProductsResponse>> => {
+    getClientBrowseProducts: async (params: {
+      ownerId: string;
+      supplierId?: string;
+      categoryId?: string;
+    }): Promise<ApiResponse<ClientBrowseProductsResponse>> => {
       const searchParams = new URLSearchParams();
       searchParams.set("ownerId", params.ownerId);
       if (params.supplierId) searchParams.set("supplierId", params.supplierId);

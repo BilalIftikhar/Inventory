@@ -37,7 +37,6 @@ export type {
   User,
   AuthContextType,
   LoginInput,
-  RegisterInput,
   LoginResponse,
   EmailNotificationType,
   EmailPreferences,

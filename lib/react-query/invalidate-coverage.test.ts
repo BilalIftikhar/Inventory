@@ -62,19 +62,25 @@ const API_WRITE_ROUTE_INVALIDATION_SPEC: Record<string, readonly string[]> = {
   "app/api/product-reviews/[id]/route.ts": ["invalidateAllServerCaches"],
   "app/api/support-tickets/route.ts": ["invalidateAllServerCaches"],
   "app/api/support-tickets/[id]/route.ts": ["invalidateAllServerCaches"],
-  "app/api/support-tickets/[id]/replies/route.ts": ["invalidateAllServerCaches"],
+  "app/api/support-tickets/[id]/replies/route.ts": [
+    "invalidateAllServerCaches",
+  ],
   "app/api/users/route.ts": ["invalidateAllServerCaches"],
   "app/api/users/[id]/route.ts": ["invalidateAllServerCaches"],
   "app/api/user/email-preferences/route.ts": ["invalidateAllServerCaches"],
-  "app/api/system-config/route.ts": ["invalidateCache(", "invalidateAllServerCaches"],
-  "app/api/auth/register/route.ts": ["invalidateAllServerCaches"],
+  "app/api/system-config/route.ts": [
+    "invalidateCache(",
+    "invalidateAllServerCaches",
+  ],
   "app/api/payments/checkout/route.ts": ["invalidateAllServerCaches"],
   "app/api/payments/webhook/route.ts": ["invalidateOnOrderChange"],
   "app/api/shipping/labels/route.ts": ["invalidateOnOrderChange"],
   "app/api/shipping/tracking/route.ts": ["invalidateOnOrderChange"],
   "app/api/shipping/webhook/route.ts": ["invalidateOnOrderChange"],
   "app/api/notifications/in-app/[id]/route.ts": ["invalidateAllServerCaches"],
-  "app/api/notifications/in-app/mark-all-read/route.ts": ["invalidateAllServerCaches"],
+  "app/api/notifications/in-app/mark-all-read/route.ts": [
+    "invalidateAllServerCaches",
+  ],
 };
 
 /** Update mutations must refresh the open detail view (setQueryData or invalidateQueries on detail) */
@@ -292,7 +298,9 @@ describe("hooks/use-back-with-refresh", () => {
 });
 
 describe("API write routes — per-route Redis invalidation spec", () => {
-  for (const [rel, patterns] of Object.entries(API_WRITE_ROUTE_INVALIDATION_SPEC)) {
+  for (const [rel, patterns] of Object.entries(
+    API_WRITE_ROUTE_INVALIDATION_SPEC,
+  )) {
     it(rel, () => {
       const content = readRepoFile(rel);
       expect(hasWriteHandler(content)).toBe(true);

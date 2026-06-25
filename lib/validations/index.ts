@@ -16,10 +16,7 @@ export {
   type ProductFormData,
 } from "./product";
 
-export {
-  createCheckoutBodySchema,
-  type CreateCheckoutBody,
-} from "./payment";
+export { createCheckoutBodySchema, type CreateCheckoutBody } from "./payment";
 
 export {
   shippoAddressSchema,
@@ -42,14 +39,7 @@ export {
 export { aiInsightsBodySchema, type AiInsightsBody } from "./ai";
 
 // Auth validations
-export {
-  registerSchema,
-  registerBodySchema,
-  loginSchema,
-  loginBodySchema,
-  type RegisterFormData,
-  type LoginFormData,
-} from "./auth";
+export { loginSchema, loginBodySchema, type LoginFormData } from "./auth";
 
 // Category validations
 export {

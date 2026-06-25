@@ -35,15 +35,6 @@ export interface LoginInput {
 }
 
 /**
- * Register request payload
- */
-export interface RegisterInput {
-  name: string;
-  email: string;
-  password: string;
-}
-
-/**
  * Login response
  */
 export interface LoginResponse {

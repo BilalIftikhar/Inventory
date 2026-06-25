@@ -403,7 +403,7 @@ stock-inventory/
 | Path                                        | Who      | Description                                                      |
 | ------------------------------------------- | -------- | ---------------------------------------------------------------- |
 | `/`                                         | Admin    | Store overview (state cards)                                     |
-| `/login`, `/register`                       | All      | Auth                                                             |
+| `/login`                                    | All      | Auth                                                             |
 | `/products`, `/products/[id]`               | All      | Products list & detail                                           |
 | `/orders`, `/orders/[id]`                   | All      | Orders list & detail                                             |
 | `/invoices`, `/invoices/[id]`               | All      | Invoices list & detail                                           |
@@ -426,7 +426,6 @@ All under `/api`, authenticated via cookie `session_id` (JWT) unless noted.
 
 ### Auth
 
-- `POST /api/auth/register` — Register
 - `POST /api/auth/login` — Login
 - `POST /api/auth/logout` — Logout
 - `GET /api/auth/session` — Current session
@@ -606,12 +605,11 @@ const form = useForm<FormData>({
 ## Walkthrough: Run and Test
 
 1. **Setup:** Set `DATABASE_URL`, `JWT_SECRET`, and `NEXT_PUBLIC_API_URL` in `.env`, then run `npm install` and `npm run dev`.
-2. **Register:** Open `/register`, create an admin user (first user can act as store owner).
-3. **Login:** Go to `/login`, sign in; you land on `/` (store overview).
-4. **Products:** Go to `/products`, add categories and suppliers, then add products.
-5. **Orders & invoices:** Create an order at `/orders`, then create or view its invoice at `/invoices`.
-6. **Roles:** Create users with roles `client` or `supplier` (e.g. via admin user management); log in as them to see client portal (`/client`) or supplier portal (`/supplier`).
-7. **Optional:** Add Stripe, Shippo, or Brevo env vars to enable payments, shipping, or email.
+2. **Login:** Go to `/login`, sign in; you land on `/` (store overview).
+3. **Products:** Go to `/products`, add categories and suppliers, then add products.
+4. **Orders & invoices:** Create an order at `/orders`, then create or view its invoice at `/invoices`.
+5. **Roles:** Create users with roles `client` or `supplier` (e.g. via admin user management); log in as them to see client portal (`/client`) or supplier portal (`/supplier`).
+6. **Optional:** Add Stripe, Shippo, or Brevo env vars to enable payments, shipping, or email.
 
 ---
 
