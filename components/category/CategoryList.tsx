@@ -19,9 +19,7 @@ import { StatisticsCard } from "@/components/home/StatisticsCard";
 import { StatisticsCardSkeleton } from "@/components/home/StatisticsCardSkeleton";
 import { Package, DollarSign, Truck, FolderTree } from "lucide-react";
 import { Category } from "@/types";
-
-const formatCurrency = (value: number) =>
-  `formatCurrency(value)`;
+import { formatCurrency } from "@/lib/utils";
 
 /**
  * Dynamic import for CategoryTable to enable code splitting

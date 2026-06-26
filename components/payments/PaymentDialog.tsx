@@ -1,10 +1,5 @@
 "use client";
 
-/**
- * Payment Dialog Component
- * Modal dialog for Stripe payment with test credentials display
- */
-
 import React, { useState } from "react";
 import { formatCurrency } from "@/lib/utils";
 import {
@@ -17,28 +12,32 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { useCreateCheckout } from "@/hooks/queries";
-import { CreditCard, Loader2, ShieldCheck } from "lucide-react";
-import TestCredentialsCard from "./TestCredentialsCard";
+import { CheckCircle2, CreditCard, Banknote, Smartphone, Building2, Loader2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 import type { CheckoutType } from "@/types";
+
+type PaymentMethod = "cod" | "jazzcash" | "easypaisa" | "bank";
+
+const PAYMENT_METHODS: Array<{ id: PaymentMethod; label: string; icon: React.ReactNode; description: string }> = [
+  { id: "cod",       label: "Cash on Delivery", icon: <Banknote className="h-5 w-5" />,                          description: "Pay in cash when your order arrives." },
+  { id: "jazzcash",  label: "JazzCash",          icon: <Smartphone className="h-5 w-5 text-red-400" />,          description: "Send payment via JazzCash mobile wallet." },
+  { id: "easypaisa", label: "EasyPaisa",         icon: <Smartphone className="h-5 w-5 text-green-400" />,        description: "Send payment via EasyPaisa mobile wallet." },
+  { id: "bank",      label: "Bank Transfer",     icon: <Building2 className="h-5 w-5 text-blue-400" />,          description: "Transfer directly to our bank account." },
+];
+
 interface PaymentDialogProps {
   type: CheckoutType;
   id: string;
   referenceNumber: string;
   amount: number;
-  items?: Array<{
-    name: string;
-    quantity?: number;
-    price: number;
-  }>;
-  /** Optional: show above Total when present */
+  items?: Array<{ name: string; quantity?: number; price: number }>;
   tax?: number | null;
-  /** Optional: show above Total when present */
   shipping?: number | null;
-  /** Optional: show above Total when present (displayed as discount) */
   discount?: number | null;
   disabled?: boolean;
   trigger?: React.ReactNode;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
 export default function PaymentDialog({
@@ -52,161 +51,126 @@ export default function PaymentDialog({
   discount,
   disabled,
   trigger,
+  open: controlledOpen,
+  onOpenChange: controlledOnOpenChange,
 }: PaymentDialogProps) {
-  const [open, setOpen] = useState(false);
-  const checkoutMutation = useCreateCheckout();
+  const [internalOpen, setInternalOpen] = useState(false);
+  const [selected, setSelected] = useState<PaymentMethod | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [done, setDone] = useState(false);
+  const { toast } = useToast();
 
-  const handlePayment = () => {
-    checkoutMutation.mutate({ type, id });
+  const open = controlledOpen !== undefined ? controlledOpen : internalOpen;
+  const setOpen = (v: boolean) => {
+    controlledOnOpenChange ? controlledOnOpenChange(v) : setInternalOpen(v);
+    if (!v) { setSelected(null); setDone(false); }
   };
 
-  const isLoading = checkoutMutation.isPending;
+  const handleConfirm = async () => {
+    if (!selected) return;
+    setLoading(true);
+    try {
+      const endpoint = type === "order" ? "orders" : "invoices";
+      await fetch(`/api/${endpoint}/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ paymentMethod: selected }),
+      });
+      setDone(true);
+      toast({ title: "Payment method saved", description: `${PAYMENT_METHODS.find(m => m.id === selected)?.label} selected for ${type} #${referenceNumber}.` });
+    } catch {
+      toast({ title: "Error", description: "Failed to save payment method.", variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const triggerEl = trigger || (
+    <Button disabled={disabled}>
+      <CreditCard className="mr-2 h-4 w-4" />
+      Pay {formatCurrency(amount)}
+    </Button>
+  );
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        {trigger || (
-          <Button disabled={disabled}>
-            <CreditCard className="mr-2 h-4 w-4" />
-            Pay {formatCurrency(amount)}
-          </Button>
-        )}
-      </DialogTrigger>
-      <DialogContent className="poppins max-h-[90vh] flex flex-col overflow-hidden pl-4 sm:pl-8 pt-4 sm:pt-7 pb-4 sm:pb-7 pr-0 border-sky-400/30 dark:border-sky-400/30 shadow-[0_30px_80px_rgba(2,132,199,0.35)] dark:shadow-[0_30px_80px_rgba(2,132,199,0.25)]">
-        <DialogHeader className="flex-shrink-0 space-y-1.5 pr-4 sm:pr-8">
-          <DialogTitle className="flex items-center gap-2 text-xl text-white  ">
-            Complete Payment
-            <ShieldCheck className="h-5 w-5 text-green-500 shrink-0" />
-          </DialogTitle>
-          <DialogDescription className="text-sm text-white/80">
-            Secure payment powered by Stripe
+      {!controlledOpen && <DialogTrigger asChild>{triggerEl}</DialogTrigger>}
+
+      <DialogContent className="poppins max-h-[90vh] overflow-y-auto border-sky-400/30 shadow-[0_30px_80px_rgba(2,132,199,0.35)] p-6">
+        <DialogHeader>
+          <DialogTitle className="text-white text-xl">Select Payment Method</DialogTitle>
+          <DialogDescription className="text-white/70">
+            {type === "order" ? "Order" : "Invoice"} #{referenceNumber} —{" "}
+            <span className="font-semibold text-white">{formatCurrency(amount)}</span>
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex flex-col gap-6 overflow-y-auto min-h-0 flex-1 w-full">
-          <div className="pr-4 sm:pr-8 flex flex-col gap-6">
-          {/* Order/Invoice Summary */}
-          <div className="rounded-lg border border-sky-400/30 dark:border-white/20 bg-white/10 dark:bg-white/5 backdrop-blur-sm p-4 space-y-3 flex-shrink-0 shadow-[0_10px_30px_rgba(2,132,199,0.15)] dark:shadow-[0_10px_30px_rgba(2,132,199,0.1)]">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-white">
-                {type === "order" ? "Order" : "Invoice"} Summary
-              </span>
-              {items?.length != null && (
-                <span className="text-sm text-white">
-                  Items ({items.length})
-                </span>
-              )}
-            </div>
-
-            {items && items.length > 0 ? (
-              <div className="space-y-2">
-                {items.slice(0, 5).map((item, idx) => (
-                  <div
-                    key={idx}
-                    className="flex items-center justify-between text-sm gap-2"
-                  >
-                    <span className="flex items-center gap-2 min-w-0">
-                      {item.quantity != null && (
-                        <span className="px-1.5 py-0.5 rounded bg-primary/10 text-white text-xs font-medium shrink-0">
-                          {item.quantity}
-                        </span>
-                      )}
-                      <span className="text-white truncate">{item.name}</span>
-                    </span>
-                    <span className="font-medium text-white shrink-0">
-                      {formatCurrency(item.price)}
-                    </span>
+        {done ? (
+          <div className="flex flex-col items-center gap-4 py-6 text-center">
+            <CheckCircle2 className="h-12 w-12 text-green-400" />
+            <p className="text-white font-semibold text-lg">Payment Method Saved</p>
+            <p className="text-white/60 text-sm">
+              {PAYMENT_METHODS.find(m => m.id === selected)?.label} has been recorded for this {type}.
+            </p>
+            <Button onClick={() => setOpen(false)}>Done</Button>
+          </div>
+        ) : (
+          <div className="space-y-4 mt-2">
+            {/* Items summary */}
+            {items && items.length > 0 && (
+              <div className="rounded-lg border border-white/10 bg-white/5 p-4 space-y-2">
+                {items.slice(0, 5).map((item, i) => (
+                  <div key={i} className="flex justify-between text-sm text-white">
+                    <span>{item.quantity != null ? `${item.quantity}× ` : ""}{item.name}</span>
+                    <span>{formatCurrency(item.price)}</span>
                   </div>
                 ))}
-                {items.length > 5 && (
-                  <p className="text-xs text-white/80 pt-1">
-                    + {items.length - 5} more items...
-                  </p>
+                {((tax != null && tax > 0) || (shipping != null && shipping > 0) || (discount != null && discount > 0)) && (
+                  <>
+                    <Separator />
+                    {tax != null && tax > 0 && <div className="flex justify-between text-sm text-white"><span>Tax</span><span>{formatCurrency(tax)}</span></div>}
+                    {shipping != null && shipping > 0 && <div className="flex justify-between text-sm text-white"><span>Shipping</span><span>{formatCurrency(shipping)}</span></div>}
+                    {discount != null && discount > 0 && <div className="flex justify-between text-sm text-white"><span>Discount</span><span className="text-emerald-400">-{formatCurrency(discount)}</span></div>}
+                  </>
                 )}
-              </div>
-            ) : (
-              <div className="text-sm">
-                <span className="text-white">
-                  {type === "order" ? "Order" : "Invoice"} #{referenceNumber}
-                </span>
+                <Separator />
+                <div className="flex justify-between font-semibold text-white">
+                  <span>Total</span><span>{formatCurrency(amount)}</span>
+                </div>
               </div>
             )}
 
-            {(tax != null && tax > 0) ||
-            (shipping != null && shipping > 0) ||
-            (discount != null && discount > 0) ? (
-              <>
-                <Separator className="my-3" />
-                <div className="space-y-1.5 text-sm">
-                  {tax != null && tax > 0 && (
-                    <div className="flex items-center justify-between text-white">
-                      <span>Tax</span>
-                      <span>{formatCurrency(tax)}</span>
-                    </div>
-                  )}
-                  {shipping != null && shipping > 0 && (
-                    <div className="flex items-center justify-between text-white">
-                      <span>Shipping</span>
-                      <span>{formatCurrency(shipping)}</span>
-                    </div>
-                  )}
-                  {discount != null && discount > 0 && (
-                    <div className="flex items-center justify-between text-white">
-                      <span>Discount</span>
-                      <span className="text-emerald-400">
-                        -{formatCurrency(discount)}
-                      </span>
-                    </div>
-                  )}
-                </div>
-              </>
-            ) : null}
-
-            <Separator className="my-3" />
-
-            <div className="flex items-center justify-between pt-1">
-              <span className="font-semibold text-white">Total</span>
-              <span className="text-xl font-semibold text-white">
-                {formatCurrency(amount)}
-              </span>
+            {/* Payment method options */}
+            <div className="grid grid-cols-1 gap-2">
+              {PAYMENT_METHODS.map((m) => (
+                <button
+                  key={m.id}
+                  type="button"
+                  onClick={() => setSelected(m.id)}
+                  className={`flex items-center gap-3 rounded-lg border p-3 text-left transition-all ${
+                    selected === m.id ? "border-sky-400/60 bg-sky-500/20" : "border-white/10 bg-white/5 hover:border-white/20"
+                  }`}
+                >
+                  <span className="text-white shrink-0">{m.icon}</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-white text-sm font-medium">{m.label}</p>
+                    <p className="text-white/50 text-xs">{m.description}</p>
+                  </div>
+                  {selected === m.id && <CheckCircle2 className="h-4 w-4 text-sky-400 shrink-0" />}
+                </button>
+              ))}
             </div>
-          </div>
 
-          {/* Test Credentials */}
-          <div className="flex-shrink-0">
-            <TestCredentialsCard />
-          </div>
-
-          {/* Pay Button */}
-          <div className="flex flex-col gap-2 flex-shrink-0">
-            <p className="text-xs text-center text-white/80">
-              No card entry here — you&apos;ll enter payment details on
-              Stripe&apos;s page after clicking below.
-            </p>
             <Button
-              onClick={handlePayment}
-              disabled={isLoading}
-              className="h-11 w-full sm:w-auto px-11 inline-flex items-center justify-center rounded-xl border border-sky-400/30 dark:border-sky-400/30 bg-gradient-to-r from-sky-500/70 via-sky-500/50 to-sky-500/30 dark:from-sky-500/70 dark:via-sky-500/50 dark:to-sky-500/30 text-white shadow-[0_15px_35px_rgba(2,132,199,0.45)] dark:shadow-[0_15px_35px_rgba(2,132,199,0.25)] backdrop-blur-sm transition duration-200 hover:border-sky-300/40 hover:from-sky-500/80 hover:via-sky-500/60 hover:to-sky-500/40 dark:hover:border-sky-300/40 dark:hover:from-sky-500/80 dark:hover:via-sky-500/60 dark:hover:to-sky-500/40 hover:shadow-[0_20px_45px_rgba(2,132,199,0.6)] dark:hover:shadow-[0_20px_45px_rgba(2,132,199,0.35)] focus-visible:ring-sky-500/50"
+              onClick={handleConfirm}
+              disabled={!selected || loading}
+              className="w-full h-11 bg-sky-600 hover:bg-sky-500 text-white"
             >
-              {isLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Redirecting to payment...
-                </>
-              ) : (
-                <>
-                  <ShieldCheck className="mr-2 h-4 w-4" />
-                  Secure checkout with Link
-                </>
-              )}
+              {loading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Saving...</> : `Confirm — ${formatCurrency(amount)}`}
             </Button>
-
-            <p className="text-xs text-center text-white">
-              You&apos;ll be redirected to Stripe&apos;s secure checkout page
-            </p>
           </div>
-          </div>
-        </div>
+        )}
       </DialogContent>
     </Dialog>
   );

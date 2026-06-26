@@ -1,16 +1,11 @@
 "use client";
 
-/**
- * Payment Button Component
- * Initiates Stripe Checkout for orders or invoices
- */
-
-import React from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { useCreateCheckout } from "@/hooks/queries";
-import { CreditCard, Loader2 } from "lucide-react";
-import type { CheckoutType } from "@/types";
+import { CreditCard } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
+import PaymentDialog from "./PaymentDialog";
+import type { CheckoutType } from "@/types";
 
 interface PaymentButtonProps {
   type: CheckoutType;
@@ -20,44 +15,38 @@ interface PaymentButtonProps {
   variant?: "default" | "outline" | "secondary";
   size?: "default" | "sm" | "lg";
   className?: string;
+  referenceNumber?: string;
+  items?: Array<{ name: string; quantity?: number; price: number }>;
 }
 
 export default function PaymentButton({
   type,
   id,
-  amount,
+  amount = 0,
   disabled,
   variant = "default",
   size = "default",
   className,
+  referenceNumber = "",
+  items,
 }: PaymentButtonProps) {
-  const checkoutMutation = useCreateCheckout();
-
-  const handlePayment = () => {
-    checkoutMutation.mutate({ type, id });
-  };
-
-  const isLoading = checkoutMutation.isPending;
+  const [open, setOpen] = useState(false);
 
   return (
-    <Button
-      onClick={handlePayment}
-      disabled={disabled || isLoading}
-      variant={variant}
-      size={size}
-      className={className}
-    >
-      {isLoading ? (
-        <>
-          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          Processing...
-        </>
-      ) : (
-        <>
-          <CreditCard className="mr-2 h-4 w-4" />
-          Pay {amount ? formatCurrency(amount) : "Now"}
-        </>
-      )}
-    </Button>
+    <>
+      <Button onClick={() => setOpen(true)} disabled={disabled} variant={variant} size={size} className={className}>
+        <CreditCard className="mr-2 h-4 w-4" />
+        Pay {amount ? formatCurrency(amount) : "Now"}
+      </Button>
+      <PaymentDialog
+        type={type}
+        id={id}
+        referenceNumber={referenceNumber}
+        amount={amount}
+        items={items}
+        open={open}
+        onOpenChange={setOpen}
+      />
+    </>
   );
 }

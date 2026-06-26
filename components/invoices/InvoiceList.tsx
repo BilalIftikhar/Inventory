@@ -37,9 +37,7 @@ import {
 import type { Invoice } from "@/types";
 import type { InvoiceWithSource } from "./InvoiceTableColumns";
 import type { InvoiceSourceFilterValue } from "./InvoiceSourceFilter";
-
-const formatCurrency = (value: number) =>
-  `formatCurrency(value)`;
+import { formatCurrency } from "@/lib/utils";
 
 const InvoiceTable = dynamic(
   () =>

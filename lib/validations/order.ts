@@ -91,6 +91,7 @@ export const updateOrderSchema = z.object({
     ])
     .optional(),
   paymentStatus: z.enum(["unpaid", "paid", "refunded", "partial"]).optional(),
+  paymentMethod: z.enum(["cod", "jazzcash", "easypaisa", "bank"]).nullable().optional(),
   shippingAddress: shippingAddressSchema.optional(),
   billingAddress: billingAddressSchema.optional(),
   trackingNumber: z.string().optional(),

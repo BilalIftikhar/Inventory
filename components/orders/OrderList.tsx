@@ -39,9 +39,7 @@ import {
 import type { Order } from "@/types";
 import type { OrderWithSource } from "./OrderTableColumns";
 import type { OrderSourceFilterValue } from "./OrderSourceFilter";
-
-const formatCurrency = (value: number) =>
-  `formatCurrency(value)`;
+import { formatCurrency } from "@/lib/utils";
 
 /** Customer display: shipping name/email, or placedByName when missing (e.g. Google one-click) */
 function getCustomerDisplay(order: Order): string {

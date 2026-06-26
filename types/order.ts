@@ -17,6 +17,7 @@ export type OrderStatus =
  * Payment status types
  */
 export type PaymentStatus = "unpaid" | "paid" | "refunded" | "partial";
+export type PaymentMethod = "cod" | "jazzcash" | "easypaisa" | "bank";
 
 /**
  * Shipping address interface
@@ -71,6 +72,7 @@ export interface Order {
   clientId?: string | null; // Client who placed the order (optional)
   status: OrderStatus;
   paymentStatus: PaymentStatus;
+  paymentMethod?: PaymentMethod | null;
   subtotal: number;
   tax?: number | null;
   shipping?: number | null;

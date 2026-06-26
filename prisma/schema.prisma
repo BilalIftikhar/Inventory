@@ -69,6 +69,7 @@ model Order {
   clientId          String?     @db.ObjectId // Client who placed the order (optional for now, will be used when client portal is implemented)
   status            String      @default("pending") // Order status: pending, confirmed, processing, shipped, delivered, cancelled
   paymentStatus     String      @default("unpaid") // Payment status: unpaid, paid, refunded, partial
+  paymentMethod     String?     // Payment method: cod, jazzcash, easypaisa, bank
   subtotal          Float       @default(0) // Order subtotal (before tax and shipping)
   tax               Float? // Tax amount (optional)
   shipping          Float? // Shipping cost (optional)

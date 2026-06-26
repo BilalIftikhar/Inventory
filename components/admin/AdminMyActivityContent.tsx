@@ -39,7 +39,7 @@ import { StatisticsCard } from "@/components/home/StatisticsCard";
 import { StatisticsCardSkeleton } from "@/components/home/StatisticsCardSkeleton";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
-import { cn } from "@/lib/utils";
+import { cn, formatCurrency } from "@/lib/utils";
 import type { Order } from "@/types";
 
 function getStatusBadgeClass(status: string): string {
@@ -261,9 +261,6 @@ export default function AdminMyActivityContent() {
       : sorted;
     return filtered.slice(0, 5);
   }, [orders, searchTerm, authUser?.name, authUser?.email]);
-
-  const formatCurrency = (value: number) =>
-    `formatCurrency(value)`;
 
   const tableSkeletonHeight = 280;
 
