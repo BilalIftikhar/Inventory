@@ -21,7 +21,7 @@ import { Package, DollarSign, Truck, FolderTree } from "lucide-react";
 import { Category } from "@/types";
 
 const formatCurrency = (value: number) =>
-  `$${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  `formatCurrency(value)`;
 
 /**
  * Dynamic import for CategoryTable to enable code splitting

@@ -46,7 +46,7 @@ import {
 } from "@/components/shared";
 import { useToast } from "@/hooks/use-toast";
 import type { OrderStatus, PaymentStatus } from "@/types";
-import { cn } from "@/lib/utils";
+import {cn, formatCurrency} from "@/lib/utils";
 import { OrderTrackingInfo, ShippingManagement } from "@/components/shipping";
 import ProductReviewsSection from "@/components/product-reviews/ProductReviewsSection";
 
@@ -585,7 +585,7 @@ export default function AdminOrderDetailContent({
                   </div>
                   <div className="text-left sm:text-right mt-2 sm:mt-0 flex flex-col items-end gap-2">
                     <p className="font-semibold text-sky-600 dark:text-sky-400 text-lg">
-                      ${Number(item.subtotal).toFixed(2)}
+                      {formatCurrency(Number(item.subtotal))}
                     </p>
                     {order.paymentStatus === "paid" && item.productId && (
                       <ProductReviewsSection
@@ -848,14 +848,14 @@ export default function AdminOrderDetailContent({
                 Subtotal:
               </span>
               <span className="font-medium text-gray-900 dark:text-white">
-                ${Number(order.subtotal).toFixed(2)}
+                {formatCurrency(Number(order.subtotal))}
               </span>
             </div>
             {order.tax != null && order.tax > 0 && (
               <div className="flex justify-between text-sm p-2 rounded-lg bg-gradient-to-r from-amber-100/40 via-amber-50/20 to-transparent dark:from-amber-500/10 dark:via-amber-500/5 dark:to-transparent">
                 <span className="text-gray-600 dark:text-gray-400">Tax:</span>
                 <span className="font-medium text-gray-900 dark:text-white">
-                  ${Number(order.tax).toFixed(2)}
+                  {formatCurrency(Number(order.tax))}
                 </span>
               </div>
             )}
@@ -865,7 +865,7 @@ export default function AdminOrderDetailContent({
                   Shipping:
                 </span>
                 <span className="font-medium text-gray-900 dark:text-white">
-                  ${Number(order.shipping).toFixed(2)}
+                  {formatCurrency(Number(order.shipping))}
                 </span>
               </div>
             )}
@@ -875,7 +875,7 @@ export default function AdminOrderDetailContent({
                   Discount:
                 </span>
                 <span className="font-medium text-rose-600 dark:text-rose-400">
-                  -${Number(order.discount).toFixed(2)}
+                  -{formatCurrency(Number(order.discount))}
                 </span>
               </div>
             )}
@@ -883,7 +883,7 @@ export default function AdminOrderDetailContent({
             <div className="flex justify-between text-lg font-semibold p-3 rounded-xl bg-gradient-to-r from-emerald-100/50 via-emerald-50/30 to-transparent dark:from-emerald-500/15 dark:via-emerald-500/10 dark:to-transparent border border-emerald-200/30 dark:border-emerald-400/20">
               <span className="text-gray-900 dark:text-white">Total:</span>
               <span className="text-emerald-600 dark:text-emerald-400">
-                ${Number(order.total).toFixed(2)}
+                {formatCurrency(Number(order.total))}
               </span>
             </div>
           </div>
@@ -1045,7 +1045,7 @@ export default function AdminOrderDetailContent({
                     Cancel this order and issue a full refund via Stripe?
                     Amount:{" "}
                     <span className="font-semibold">
-                      ${Number(order.total).toFixed(2)}
+                      {formatCurrency(Number(order.total))}
                     </span>
                     . Status will be cancelled, stock restored, invoice
                     cancelled, and all related pages will update.

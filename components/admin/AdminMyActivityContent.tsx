@@ -263,10 +263,7 @@ export default function AdminMyActivityContent() {
   }, [orders, searchTerm, authUser?.name, authUser?.email]);
 
   const formatCurrency = (value: number) =>
-    `$${value.toLocaleString(undefined, {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    })}`;
+    `formatCurrency(value)`;
 
   const tableSkeletonHeight = 280;
 
@@ -563,7 +560,7 @@ export default function AdminMyActivityContent() {
                           </Badge>
                         </TableCell>
                         <TableCell className="text-gray-800 dark:text-gray-200">
-                          ${Number(order.total).toFixed(2)}
+                          {formatCurrency(Number(order.total))}
                         </TableCell>
                         <TableCell className="text-gray-800 dark:text-gray-200">
                           {order.items?.length ?? 0}

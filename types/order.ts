@@ -118,9 +118,6 @@ export interface CreateOrderInput {
   }>;
   shippingAddress?: ShippingAddress;
   billingAddress?: BillingAddress;
-  tax?: number;
-  shipping?: number;
-  discount?: number;
   notes?: string;
 }
 

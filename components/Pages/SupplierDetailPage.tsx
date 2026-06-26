@@ -46,7 +46,7 @@ import SupplierDialog from "@/components/supplier/SupplierDialog";
 import { AlertDialogWrapper } from "@/components/dialogs";
 import type { Supplier } from "@/types";
 import Image from "next/image";
-import { cn } from "@/lib/utils";
+import {cn, formatCurrency} from "@/lib/utils";
 
 /**
  * Color variants for glassmorphic cards
@@ -558,7 +558,7 @@ export default function SupplierDetailPage({
                       Total Revenue:
                     </span>
                     <span className="text-lg font-semibold text-emerald-600 dark:text-emerald-400">
-                      ${stats.totalRevenue.toFixed(2)}
+                      {formatCurrency(stats.totalRevenue)}
                     </span>
                   </div>
 
@@ -576,7 +576,7 @@ export default function SupplierDetailPage({
                       Current Stock Value:
                     </span>
                     <span className="text-lg font-semibold text-blue-600 dark:text-blue-400">
-                      ${stats.totalValue.toFixed(2)}
+                      {formatCurrency(stats.totalValue)}
                     </span>
                   </div>
                 </div>
@@ -679,7 +679,7 @@ export default function SupplierDetailPage({
                           Product: {order.productName} (SKU: {order.productSku})
                         </p>
                         <p className="text-sm text-gray-600 dark:text-white/60">
-                          Quantity: {order.quantity} × ${order.price.toFixed(2)}{" "}
+                          Quantity: {order.quantity} × {formatCurrency(order.price)}{" "}
                           • Date:{" "}
                           <ClientDate date={order.orderDate} />
                         </p>
@@ -691,14 +691,14 @@ export default function SupplierDetailPage({
                           order.proportionalAmount !== order.subtotal ? (
                             <>
                               <span className="text-gray-500 dark:text-white/50 line-through mr-2">
-                                ${order.subtotal.toFixed(2)}
+                                {formatCurrency(order.subtotal)}
                               </span>
                               <span className="text-rose-600 dark:text-rose-400">
-                                ${order.proportionalAmount.toFixed(2)}
+                                {formatCurrency(order.proportionalAmount)}
                               </span>
                             </>
                           ) : (
-                            `$${order.subtotal.toFixed(2)}`
+                            formatCurrency(order.subtotal)
                           )}
                         </p>
                         <Badge

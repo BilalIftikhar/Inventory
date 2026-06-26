@@ -7,6 +7,7 @@
 "use client";
 
 import React, { useState, useRef, useCallback, useEffect } from "react";
+import { formatCurrency } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -38,7 +39,6 @@ import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FormField, FormNumberField } from "@/components/forms";
 import { DeferredSelectGate } from "@/components/shared";
-
 interface InvoiceDialogProps {
   children?: React.ReactNode;
   open?: boolean;
@@ -48,7 +48,7 @@ interface InvoiceDialogProps {
 }
 
 const fmt = (v: number) =>
-  `$${v.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  `formatCurrency(v)`;
 
 /**
  * Invoice Dialog Component
@@ -659,7 +659,7 @@ export default function InvoiceDialog({
               </DeferredSelectGate>
               {selectedOrder && (
                 <p className="text-xs text-white/60">
-                  Order Total: ${selectedOrder.total.toFixed(2)} | Items: {selectedOrder.items?.length || 0}
+                  Order Total: {formatCurrency(selectedOrder.total)} | Items: {selectedOrder.items?.length || 0}
                 </p>
               )}
             </div>

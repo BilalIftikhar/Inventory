@@ -94,11 +94,8 @@ export async function createOrder(data: CreateOrderInput, userId: string) {
     productsToReserve.push({ id: item.productId, qty: item.quantity });
   }
 
-  // Calculate total
-  const tax = data.tax || 0;
-  const shipping = data.shipping || 0;
-  const discount = data.discount || 0;
-  const total = subtotal + tax + shipping - discount;
+  // Calculate total without fees
+  const total = subtotal;
 
   // Create order with items
   const order = await prisma.order.create({
@@ -109,9 +106,9 @@ export async function createOrder(data: CreateOrderInput, userId: string) {
       status: "pending",
       paymentStatus: "unpaid",
       subtotal,
-      tax: tax > 0 ? tax : null,
-      shipping: shipping > 0 ? shipping : null,
-      discount: discount > 0 ? discount : null,
+      tax: null,
+      shipping: null,
+      discount: null,
       total,
       shippingAddress: data.shippingAddress
         ? (JSON.parse(
@@ -703,7 +700,10 @@ export async function cancelOrder(orderId: string, userId: string) {
         await createStripeRefund(paymentIntentId, "requested_by_customer");
       } catch (refundErr) {
         // Log but don't fail - order will still be cancelled; admin can refund manually in Stripe
-        console.error("Stripe refund failed during order cancellation:", refundErr);
+        console.error(
+          "Stripe refund failed during order cancellation:",
+          refundErr,
+        );
       }
     }
   }

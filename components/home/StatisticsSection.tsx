@@ -21,10 +21,7 @@ import { StatisticsCardSkeleton } from "./StatisticsCardSkeleton";
 import { useDashboard } from "@/hooks/queries/use-dashboard";
 
 const formatCurrency = (value: number) =>
-  `$${value.toLocaleString(undefined, {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })}`;
+  `formatCurrency(value)`;
 
 /**
  * StatisticsSection — 8 cards in same order and format as admin dashboard-overall-insights.

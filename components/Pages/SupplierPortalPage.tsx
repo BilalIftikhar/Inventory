@@ -41,7 +41,7 @@ import Navbar from "@/components/layouts/Navbar";
 import { PageContentWrapper } from "@/components/shared";
 import { StatisticsCard } from "@/components/home/StatisticsCard";
 import { StatisticsCardSkeleton } from "@/components/home/StatisticsCardSkeleton";
-import { cn } from "@/lib/utils";
+import {cn, formatCurrency} from "@/lib/utils";
 
 /**
  * Get order status badge with distinct colors (matches order table/detail)
@@ -188,10 +188,7 @@ export default function SupplierPortalPage() {
                 },
                 {
                   label: "Product value",
-                  value: `$${(dashboard.productValue ?? 0).toLocaleString(
-                    undefined,
-                    { minimumFractionDigits: 2, maximumFractionDigits: 2 },
-                  )}`,
+                  value: `formatCurrency((dashboard.productValue ?? 0))`,
                 },
               ]}
             />
@@ -252,63 +249,48 @@ export default function SupplierPortalPage() {
             />
             <StatisticsCard
               title="Total Revenue"
-              value={`$${(dashboard.totalRevenue ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+              value={`formatCurrency((dashboard.totalRevenue ?? 0))`}
               description="Revenue from your products (excl. cancelled)"
               icon={DollarSign}
               variant="violet"
               badges={[
                 {
                   label: "Paid",
-                  value: `$${(
+                  value: `formatCurrency((
                     dashboard.revenueBreakdown?.paid ?? dashboard.paidRevenue
-                  ).toLocaleString(undefined, {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}`,
+                  ))`,
                 },
                 {
                   label: "Due",
-                  value: `$${(
+                  value: `formatCurrency((
                     dashboard.revenueBreakdown?.due ?? 0
-                  ).toLocaleString(undefined, {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}`,
+                  ))`,
                 },
                 {
                   label: "Refund",
-                  value: `$${(
+                  value: `formatCurrency((
                     dashboard.revenueBreakdown?.refund ?? 0
-                  ).toLocaleString(undefined, {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}`,
+                  ))`,
                 },
                 {
                   label: "Pending",
-                  value: `$${(
+                  value: `formatCurrency((
                     dashboard.revenueBreakdown?.pending ??
                     dashboard.unpaidRevenue
-                  ).toLocaleString(undefined, {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}`,
+                  ))`,
                 },
                 ...(dashboard.totalOrders > 0
                   ? [
                       {
                         label: "Avg/Order",
-                        value: `$${(
+                        value: `formatCurrency((
                           dashboard.totalRevenue /
                           Math.max(
                             1,
                             dashboard.totalOrders -
                               (dashboard.orderStatusCounts?.cancelled ?? 0),
                           )
-                        ).toLocaleString(undefined, {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                        })}`,
+                        ))`,
                       },
                     ]
                   : []),
@@ -347,7 +329,7 @@ export default function SupplierPortalPage() {
                   <YAxis />
                   <Tooltip
                     formatter={(value) => [
-                      `$${Number(value).toLocaleString()}`,
+                      formatCurrency(Number(value).toLocaleString()),
                       "Revenue",
                     ]}
                   />
@@ -409,7 +391,7 @@ export default function SupplierPortalPage() {
                               </Link>
                             </TableCell>
                             <TableCell className="text-right">
-                              ${order.total.toFixed(2)}
+                              {formatCurrency(order.total)}
                             </TableCell>
                             <TableCell>
                               {getStatusBadge(order.status)}

@@ -13,6 +13,7 @@ import React, {
   useCallback,
   useEffect,
 } from "react";
+import { formatCurrency } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -66,7 +67,6 @@ import { logger } from "@/lib/logger";
 import { Plus, Trash2, X } from "lucide-react";
 import { useAuth } from "@/contexts";
 import { useToast } from "@/hooks/use-toast";
-
 interface OrderDialogProps {
   children?: React.ReactNode;
   open?: boolean;
@@ -100,9 +100,6 @@ interface OrderFormData {
     country: string;
   };
   useSameAddress?: boolean;
-  tax?: number;
-  shipping?: number;
-  discount?: number;
   notes?: string;
 }
 
@@ -127,39 +124,6 @@ const paymentStatusOptions: Array<{ value: PaymentStatus; label: string }> = [
   { value: "partial", label: "Partial" },
   { value: "refunded", label: "Refunded" },
 ];
-
-/** Tax: 7% of subtotal (hardcoded). */
-const TAX_RATE = 0.07;
-/** Shipping: fixed $4.99 (hardcoded). */
-const SHIPPING_FIXED = 4.99;
-
-/**
- * Discount percent by subtotal tiers (hardcoded):
- * &lt; $100 → 10%, $100–$300 → 20%, $300–$500 → 30%, $500+ → 50%
- */
-function getDiscountPercent(subtotal: number): number {
-  if (subtotal < 100) return 10;
-  if (subtotal < 300) return 20;
-  if (subtotal < 500) return 30;
-  return 50;
-}
-
-/**
- * Compute tax, shipping, and discount amounts from subtotal.
- * Used for display and for create-order payload (all roles).
- */
-function getOrderFeesFromSubtotal(subtotal: number): {
-  taxAmount: number;
-  shippingAmount: number;
-  discountPercent: number;
-  discountAmount: number;
-} {
-  const taxAmount = subtotal * TAX_RATE;
-  const shippingAmount = SHIPPING_FIXED;
-  const discountPercent = getDiscountPercent(subtotal);
-  const discountAmount = subtotal * (discountPercent / 100);
-  return { taxAmount, shippingAmount, discountPercent, discountAmount };
-}
 
 /**
  * Order Dialog Component
@@ -226,10 +190,12 @@ export default function OrderDialog({
   // Filter to only show available products (status !== "Stock Out")
   const availableProducts = useMemo(
     () =>
-      products.filter(
-        (product: { status?: string; quantity?: number }) =>
-          product.status !== "Stock Out" && Number(product.quantity ?? 0) > 0,
-      ),
+      products.filter((product: { status?: string; quantity?: number }) => {
+        const status = String(product.status ?? "")
+          .trim()
+          .toLowerCase();
+        return status !== "stock_out" && status !== "stock out";
+      }),
     [products],
   );
 
@@ -263,9 +229,6 @@ export default function OrderDialog({
         zipCode: "",
         country: "",
       },
-      tax: 0,
-      shipping: 0,
-      discount: 0,
       notes: "",
     },
   });
@@ -296,14 +259,11 @@ export default function OrderDialog({
   const subtotal = useMemo(() => {
     if (!watchedItems || watchedItems.length === 0) return 0;
     return watchedItems.reduce((sum, item) => {
-      // Skip items without product
       if (!item?.productId) return sum;
-      // Convert quantity to number, handling undefined or null
       const itemQuantity =
         item.quantity !== undefined && item.quantity !== null
           ? Number(item.quantity)
           : 0;
-      // Skip if quantity is invalid or zero
       if (itemQuantity <= 0) return sum;
       const product = availableProducts.find((p) => p.id === item.productId);
       if (!product) return sum;
@@ -311,17 +271,6 @@ export default function OrderDialog({
       return sum + itemPrice * itemQuantity;
     }, 0);
   }, [watchedItems, availableProducts]);
-
-  // Tax, shipping, discount: computed from subtotal (hardcoded rules) — no dropdowns
-  const orderFees = useMemo(
-    () => getOrderFeesFromSubtotal(subtotal),
-    [subtotal],
-  );
-  const total =
-    subtotal +
-    orderFees.taxAmount +
-    orderFees.shippingAmount -
-    orderFees.discountAmount;
 
   // Sync billing address with shipping address if checkbox is checked
   useEffect(() => {
@@ -353,9 +302,6 @@ export default function OrderDialog({
           zipCode: "",
           country: "",
         },
-        tax: 0,
-        shipping: 0,
-        discount: 0,
         notes: "",
       });
     }
@@ -382,18 +328,6 @@ export default function OrderDialog({
       if (validItems.length === 0) {
         throw new Error("At least one order item is required");
       }
-
-      // Compute subtotal and fees (tax 7%, shipping $4.99, discount by tier) for payload
-      const submitSubtotal = validItems.reduce((sum, item) => {
-        const product = availableProducts.find((p) => p.id === item.productId);
-        if (!product) return sum;
-        const qty =
-          item.quantity !== undefined && item.quantity !== null
-            ? Number(item.quantity)
-            : 0;
-        return sum + Number(product.price) * qty;
-      }, 0);
-      const fees = getOrderFeesFromSubtotal(submitSubtotal);
 
       // Check stock availability for each item
       for (const item of validItems) {
@@ -448,9 +382,6 @@ export default function OrderDialog({
         billingAddress: hasValidAddress(data.billingAddress)
           ? (data.billingAddress as BillingAddress)
           : undefined,
-        tax: fees.taxAmount,
-        shipping: fees.shippingAmount,
-        discount: fees.discountAmount,
         notes: data.notes || undefined,
       };
 
@@ -477,9 +408,6 @@ export default function OrderDialog({
           zipCode: "",
           country: "",
         },
-        tax: 0,
-        shipping: 0,
-        discount: 0,
         notes: "",
       });
     } catch (error) {
@@ -719,8 +647,7 @@ export default function OrderDialog({
                       <Select
                         key={selectRemountKey}
                         value={
-                          editFormMethods.watch("status") ||
-                          editingOrder.status
+                          editFormMethods.watch("status") || editingOrder.status
                         }
                         onValueChange={(value) =>
                           editFormMethods.setValue(
@@ -1116,9 +1043,7 @@ export default function OrderDialog({
                                             value={product.id}
                                             className="cursor-pointer text-gray-900 dark:text-white focus:bg-violet-100 dark:focus:bg-white/10 focus:text-gray-900 dark:focus:text-white"
                                           >
-                                            {product.name} - $
-                                            {Number(product.price).toFixed(2)}{" "}
-                                            (Stock: {product.quantity})
+                                            {product.name} - {formatCurrency(Number(product.price))} (Stock: {product.quantity})
                                           </SelectItem>
                                         ))
                                       )}
@@ -1219,7 +1144,7 @@ export default function OrderDialog({
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             {/* Subtotal - aligned with product column */}
                             <div className="text-sm text-white/70">
-                              Subtotal: ${itemSubtotal.toFixed(2)} (
+                              Subtotal: {formatCurrency(itemSubtotal)} (
                               {selectedProduct.name} × {quantity || 0})
                             </div>
                             {/* Stock validation warning - aligned with quantity column */}
@@ -1360,34 +1285,22 @@ export default function OrderDialog({
                   )}
                 </div>
 
-                {/* Order Totals Section — tax 7%, shipping $4.99, discount by subtotal tier (computed, no dropdowns) */}
-                <div className="space-y-4">
-                  <Label className="text-white/80 text-base font-semibold">
-                    Order Totals
-                  </Label>
-                  <div className="p-4 border border-violet-400/20 rounded-lg bg-white/5 space-y-2">
-                    <div className="flex justify-between text-sm text-white/70">
-                      <span>Subtotal:</span>
-                      <span>${subtotal.toFixed(2)}</span>
+                {/* Order Totals Summary */}
+                <div className="rounded-3xl border border-violet-400/20 bg-white/5 p-4 text-white/80">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                      <p className="text-sm font-semibold text-white">
+                        Order Total
+                      </p>
+                      <p className="text-xs text-white/60">
+                        This order only includes product subtotal. Tax,
+                        shipping, and discount are not part of the creation
+                        flow.
+                      </p>
                     </div>
-                    <div className="flex justify-between text-sm text-white/70">
-                      <span>Tax (7%):</span>
-                      <span>${orderFees.taxAmount.toFixed(2)}</span>
-                    </div>
-                    <div className="flex justify-between text-sm text-white/70">
-                      <span>Shipping:</span>
-                      <span>${orderFees.shippingAmount.toFixed(2)}</span>
-                    </div>
-                    <div className="flex justify-between text-sm text-white/70">
-                      <span>Discount ({orderFees.discountPercent}%):</span>
-                      <span className="text-red-400">
-                        -${orderFees.discountAmount.toFixed(2)}
-                      </span>
-                    </div>
-                    <div className="flex justify-between text-base font-semibold text-white pt-2 border-t border-violet-400/20">
-                      <span>Total:</span>
-                      <span>${total.toFixed(2)}</span>
-                    </div>
+                    <p className="text-xl font-semibold text-white">
+                      {formatCurrency(subtotal)}
+                    </p>
                   </div>
                 </div>
 

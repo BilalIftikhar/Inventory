@@ -6,6 +6,7 @@
 "use client";
 
 import React from "react";
+import { formatCurrency } from "@/lib/utils";
 import { Column, ColumnDef } from "@tanstack/react-table";
 import { Order } from "@/types";
 import { Badge } from "@/components/ui/badge";
@@ -30,7 +31,6 @@ import { IoMdArrowDown, IoMdArrowUp } from "react-icons/io";
 import { format } from "date-fns";
 import Link from "next/link";
 import OrderActions from "./OrderActions";
-
 /**
  * Get order status badge color
  */
@@ -253,7 +253,7 @@ export const createOrderColumns = (
     header: ({ column }) => <SortableHeader column={column} label="Total" />,
     cell: ({ getValue }) => {
       const total = getValue<number>();
-      return <span className="font-semibold">${total.toFixed(2)}</span>;
+      return <span className="font-semibold">{formatCurrency(total)}</span>;
     },
   },
   {

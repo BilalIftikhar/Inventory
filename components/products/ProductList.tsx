@@ -21,7 +21,7 @@ import { AnalyticsCard } from "@/components/ui/analytics-card";
 import { AnalyticsCardSkeleton } from "@/components/ui/analytics-card-skeleton";
 import { Badge } from "@/components/ui/badge";
 import { Package, DollarSign, Truck, FolderTree } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, formatCurrency } from "@/lib/utils";
 
 const ProductTable = dynamic(
   () =>
@@ -101,9 +101,6 @@ const ProductList = React.memo(() => {
   const [selectedSuppliers, setSelectedSuppliers] = useState<string[]>([]);
 
   // Removed debug log - use React DevTools for debugging
-
-  const formatCurrency = (value: number) =>
-    `$${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
   // Determine loading state - FIXES HYDRATION & FLICKER
   const productsQueryPending = productsQuery.isPending;

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useMemo, useCallback } from "react";
+import { formatCurrency } from "@/lib/utils";
 import { Product, Category, Supplier } from "@/types";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -23,7 +24,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
 type FiltersAndActionsProps = {
   allProducts: Product[];
   allCategories: Category[];
@@ -125,7 +125,7 @@ export default function FiltersAndActions({
       const csvData = filteredProducts.map((product) => ({
         "Product Name": product.name,
         SKU: product.sku,
-        Price: `$${product.price.toFixed(2)}`,
+        Price: formatCurrency(product.price),
         Quantity: product.quantity,
         Status: product.status,
         Category: product.category || "Unknown",

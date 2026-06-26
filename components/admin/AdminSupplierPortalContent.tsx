@@ -20,7 +20,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { format } from "date-fns";
-import { cn } from "@/lib/utils";
+import {cn, formatCurrency} from "@/lib/utils";
 import type { SupplierPortalStats } from "@/types";
 
 type CardVariant = "sky" | "emerald" | "amber" | "violet" | "blue" | "teal";
@@ -207,7 +207,7 @@ export default function AdminSupplierPortalContent({
               />
               <AnalyticsCard
                 title="Inventory Value"
-                value={`$${stats.counts?.totalValue.toLocaleString()}`}
+                value={formatCurrency(stats.counts?.totalValue.toLocaleString())}
                 icon={DollarSign}
                 description="Total product value"
                 variant="amber"
@@ -270,7 +270,7 @@ export default function AdminSupplierPortalContent({
                         {p.status.replace("_", " ")}
                       </Badge>
                       <span className="text-sm font-medium text-gray-900 dark:text-white">
-                        ${p.price.toLocaleString()}
+                        {formatCurrency(p.price)}
                       </span>
                     </div>
                   </li>
@@ -344,7 +344,7 @@ export default function AdminSupplierPortalContent({
                         {o.status}
                       </Badge>
                       <span className="text-sm font-medium text-gray-900 dark:text-white">
-                        ${o.total.toLocaleString()}
+                        {formatCurrency(o.total)}
                       </span>
                     </div>
                   </li>
@@ -434,7 +434,7 @@ export default function AdminSupplierPortalContent({
                         {s.orderCount}
                       </td>
                       <td className="py-3 text-right font-medium text-gray-900 dark:text-white">
-                        ${s.totalValue.toLocaleString()}
+                        {formatCurrency(s.totalValue)}
                       </td>
                     </tr>
                   ))}

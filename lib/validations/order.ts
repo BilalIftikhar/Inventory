@@ -40,14 +40,22 @@ export const orderItemSchema = z.object({
  */
 const transformEmptyAddress = (address: unknown): unknown => {
   if (!address || typeof address !== "object") return address;
-  
+
   const addr = address as Record<string, unknown>;
-  const hasRequiredFields = 
-    addr.street && typeof addr.street === "string" && addr.street.trim() !== "" &&
-    addr.city && typeof addr.city === "string" && addr.city.trim() !== "" &&
-    addr.zipCode && typeof addr.zipCode === "string" && addr.zipCode.trim() !== "" &&
-    addr.country && typeof addr.country === "string" && addr.country.trim() !== "";
-  
+  const hasRequiredFields =
+    addr.street &&
+    typeof addr.street === "string" &&
+    addr.street.trim() !== "" &&
+    addr.city &&
+    typeof addr.city === "string" &&
+    addr.city.trim() !== "" &&
+    addr.zipCode &&
+    typeof addr.zipCode === "string" &&
+    addr.zipCode.trim() !== "" &&
+    addr.country &&
+    typeof addr.country === "string" &&
+    addr.country.trim() !== "";
+
   return hasRequiredFields ? address : undefined;
 };
 
@@ -57,11 +65,14 @@ const transformEmptyAddress = (address: unknown): unknown => {
 export const createOrderSchema = z.object({
   clientId: z.string().optional(),
   items: z.array(orderItemSchema).min(1, "At least one item is required"),
-  shippingAddress: z.preprocess(transformEmptyAddress, shippingAddressSchema.optional()),
-  billingAddress: z.preprocess(transformEmptyAddress, billingAddressSchema.optional()),
-  tax: z.number().nonnegative("Tax must be non-negative").optional(),
-  shipping: z.number().nonnegative("Shipping must be non-negative").optional(),
-  discount: z.number().nonnegative("Discount must be non-negative").optional(),
+  shippingAddress: z.preprocess(
+    transformEmptyAddress,
+    shippingAddressSchema.optional(),
+  ),
+  billingAddress: z.preprocess(
+    transformEmptyAddress,
+    billingAddressSchema.optional(),
+  ),
   notes: z.string().optional(),
 });
 

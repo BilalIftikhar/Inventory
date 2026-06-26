@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Product } from "@/types";
 import { Column, ColumnDef } from "@tanstack/react-table";
+import { formatCurrency } from "@/lib/utils";
 //import { ReactNode } from "react";
 
 import ProductDropDown from "./ProductActions";
@@ -157,7 +158,7 @@ export function createProductColumns(
   {
     accessorKey: "price",
     header: ({ column }) => <SortableHeader column={column} label="Price" />,
-    cell: ({ getValue }) => `$${getValue<number>().toFixed(2)}`,
+    cell: ({ getValue }) => formatCurrency(getValue<number>()),
   },
   {
     accessorKey: "createdAt",

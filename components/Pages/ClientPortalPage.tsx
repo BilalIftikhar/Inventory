@@ -49,7 +49,7 @@ import Navbar from "@/components/layouts/Navbar";
 import { PageContentWrapper } from "@/components/shared";
 import { StatisticsCard } from "@/components/home/StatisticsCard";
 import { StatisticsCardSkeleton } from "@/components/home/StatisticsCardSkeleton";
-import { cn } from "@/lib/utils";
+import {cn, formatCurrency} from "@/lib/utils";
 
 /** Catalog badge: Active = green (success), Inactive = secondary (gray) — matches admin/user style */
 function CatalogStatusBadge({ status }: { status: string }) {
@@ -265,69 +265,48 @@ export default function ClientPortalPage() {
             />
             <StatisticsCard
               title="Total Spent"
-              value={`$${dashboard.totalSpent.toLocaleString(undefined, {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })}`}
+              value={`formatCurrency(dashboard.totalSpent)`}
               description="Total order value"
               icon={DollarSign}
               variant="emerald"
               badges={[
                 {
                   label: "Paid",
-                  value: `$${(
+                  value: `formatCurrency((
                     dashboard.paymentBreakdown?.paid ?? 0
-                  ).toLocaleString(undefined, {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}`,
+                  ))`,
                 },
                 {
                   label: "Due",
-                  value: `$${(
+                  value: `formatCurrency((
                     dashboard.paymentBreakdown?.due ?? 0
-                  ).toLocaleString(undefined, {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}`,
+                  ))`,
                 },
                 {
                   label: "Refund",
-                  value: `$${(
+                  value: `formatCurrency((
                     dashboard.paymentBreakdown?.refund ?? 0
-                  ).toLocaleString(undefined, {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}`,
+                  ))`,
                 },
                 {
                   label: "Pending",
-                  value: `$${(
+                  value: `formatCurrency((
                     dashboard.paymentBreakdown?.pending ?? 0
-                  ).toLocaleString(undefined, {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}`,
+                  ))`,
                 },
                 {
                   label: "Cancelled",
-                  value: `$${(
+                  value: `formatCurrency((
                     dashboard.paymentBreakdown?.cancelled ?? 0
-                  ).toLocaleString(undefined, {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}`,
+                  ))`,
                 },
                 ...(dashboard.totalOrders > 0
                   ? [
                       {
                         label: "Avg/Order",
-                        value: `$${(
+                        value: `formatCurrency((
                           dashboard.totalSpent / dashboard.totalOrders
-                        ).toLocaleString(undefined, {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                        })}`,
+                        ))`,
                       },
                     ]
                   : []),
@@ -335,10 +314,7 @@ export default function ClientPortalPage() {
             />
             <StatisticsCard
               title="Outstanding"
-              value={`$${dashboard.outstandingAmount.toLocaleString(undefined, {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })}`}
+              value={`formatCurrency(dashboard.outstandingAmount)`}
               description="Unpaid invoice balance"
               icon={AlertCircle}
               variant="rose"
@@ -400,7 +376,7 @@ export default function ClientPortalPage() {
                   <YAxis />
                   <Tooltip
                     formatter={(value) => [
-                      `$${Number(value).toLocaleString()}`,
+                      formatCurrency(Number(value).toLocaleString()),
                       "Spent",
                     ]}
                   />
@@ -643,7 +619,7 @@ export default function ClientPortalPage() {
                                   )}
                                 </TableCell>
                                 <TableCell className="text-right">
-                                  ${p.price.toFixed(2)}
+                                  {formatCurrency(p.price)}
                                 </TableCell>
                                 <TableCell>
                                   <ProductStatusBadge status={p.status} />
@@ -710,7 +686,7 @@ export default function ClientPortalPage() {
                               </p>
                             </TableCell>
                             <TableCell className="text-right">
-                              ${order.total.toFixed(2)}
+                              {formatCurrency(order.total)}
                             </TableCell>
                             <TableCell>
                               {getOrderStatusBadge(order.status)}
@@ -779,11 +755,11 @@ export default function ClientPortalPage() {
                                 {invoice.invoiceNumber}
                               </Link>
                               <p className="text-xs text-muted-foreground">
-                                Total: ${invoice.total.toFixed(2)}
+                                Total: {formatCurrency(invoice.total)}
                               </p>
                             </TableCell>
                             <TableCell className="text-right font-semibold">
-                              ${invoice.amountDue.toFixed(2)}
+                              {formatCurrency(invoice.amountDue)}
                             </TableCell>
                             <TableCell>
                               {getInvoiceStatusBadge(invoice.status)}

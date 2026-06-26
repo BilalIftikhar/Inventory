@@ -39,7 +39,7 @@ import {
 } from "@/components/shared";
 import type { OrderStatus, PaymentStatus } from "@/types";
 import type { Order } from "@/types";
-import { cn } from "@/lib/utils";
+import {cn, formatCurrency} from "@/lib/utils";
 import OrderDialog from "@/components/orders/OrderDialog";
 import { AlertDialogWrapper } from "@/components/dialogs";
 import { PaymentDialog } from "@/components/payments";
@@ -582,12 +582,12 @@ export default function OrderDetailPage() {
                       </p>
                     )}
                     <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                      Quantity: {item.quantity} × ${item.price.toFixed(2)}
+                      Quantity: {item.quantity} × {formatCurrency(item.price)}
                     </p>
                   </div>
                   <div className="text-left sm:text-right mt-2 sm:mt-0 flex flex-col items-end gap-2">
                     <p className="font-semibold text-sky-600 dark:text-sky-400 text-lg">
-                      ${item.subtotal.toFixed(2)}
+                      {formatCurrency(item.subtotal)}
                     </p>
                     {order.paymentStatus === "paid" && (
                       <ProductReviewsSection
@@ -861,7 +861,7 @@ export default function OrderDetailPage() {
                       Subtotal:
                     </span>
                     <span className="font-medium text-gray-900 dark:text-white">
-                      ${order.subtotal.toFixed(2)}
+                      {formatCurrency(order.subtotal)}
                     </span>
                   </div>
                   {order.tax && order.tax > 0 && (
@@ -870,7 +870,7 @@ export default function OrderDetailPage() {
                         Tax:
                       </span>
                       <span className="font-medium text-gray-900 dark:text-white">
-                        ${order.tax.toFixed(2)}
+                        {formatCurrency(order.tax)}
                       </span>
                     </div>
                   )}
@@ -880,7 +880,7 @@ export default function OrderDetailPage() {
                         Shipping:
                       </span>
                       <span className="font-medium text-gray-900 dark:text-white">
-                        ${order.shipping.toFixed(2)}
+                        {formatCurrency(order.shipping)}
                       </span>
                     </div>
                   )}
@@ -890,7 +890,7 @@ export default function OrderDetailPage() {
                         Discount:
                       </span>
                       <span className="font-medium text-rose-600 dark:text-rose-400">
-                        -${order.discount.toFixed(2)}
+                        -{formatCurrency(order.discount)}
                       </span>
                     </div>
                   )}
@@ -900,7 +900,7 @@ export default function OrderDetailPage() {
                       Total:
                     </span>
                     <span className="text-emerald-600 dark:text-emerald-400">
-                      ${order.total.toFixed(2)}
+                      {formatCurrency(order.total)}
                     </span>
                   </div>
                 </div>
@@ -961,7 +961,7 @@ export default function OrderDetailPage() {
                           className="w-full sm:w-auto gap-2 rounded-xl border border-emerald-400/30 bg-gradient-to-r from-emerald-500/70 via-emerald-500/50 to-emerald-500/30 text-white shadow-[0_10px_25px_rgba(16,185,129,0.35)] backdrop-blur-sm hover:border-emerald-300/50 hover:from-emerald-500/80 hover:via-emerald-500/60 hover:to-emerald-500/40 transition-all duration-300 disabled:opacity-50"
                         >
                           <CreditCard className="h-4 w-4 shrink-0" />
-                          Pay ${order.total.toFixed(2)}
+                          Pay {formatCurrency(order.total)}
                         </Button>
                       }
                     />

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useMemo, useState, useEffect, useRef } from "react";
+import { formatCurrency } from "@/lib/utils";
 import Link from "next/link";
 import {
   Card,
@@ -39,7 +40,6 @@ import {
 import { PageContentWrapper } from "@/components/shared";
 import { format } from "date-fns";
 import type { Order } from "@/types";
-
 /** Shipping address may include name/email in stored JSON */
 function getCustomerDisplay(order: Order): string {
   const addr = order.shippingAddress as
@@ -364,7 +364,7 @@ export default function AdminDashboardOverview({
                         {order.id.slice(0, 8)}…
                       </TableCell>
                       <TableCell>{getCustomerDisplay(order)}</TableCell>
-                      <TableCell>${Number(order.total).toFixed(2)}</TableCell>
+                      <TableCell>{formatCurrency(Number(order.total))}</TableCell>
                       <TableCell>{order.items?.length ?? 0}</TableCell>
                       <TableCell className="text-muted-foreground">
                         {format(

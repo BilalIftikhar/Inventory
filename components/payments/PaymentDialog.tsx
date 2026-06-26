@@ -6,6 +6,7 @@
  */
 
 import React, { useState } from "react";
+import { formatCurrency } from "@/lib/utils";
 import {
   Dialog,
   DialogContent,
@@ -20,7 +21,6 @@ import { useCreateCheckout } from "@/hooks/queries";
 import { CreditCard, Loader2, ShieldCheck } from "lucide-react";
 import TestCredentialsCard from "./TestCredentialsCard";
 import type { CheckoutType } from "@/types";
-
 interface PaymentDialogProps {
   type: CheckoutType;
   id: string;
@@ -68,7 +68,7 @@ export default function PaymentDialog({
         {trigger || (
           <Button disabled={disabled}>
             <CreditCard className="mr-2 h-4 w-4" />
-            Pay ${amount.toFixed(2)}
+            Pay {formatCurrency(amount)}
           </Button>
         )}
       </DialogTrigger>
@@ -114,7 +114,7 @@ export default function PaymentDialog({
                       <span className="text-white truncate">{item.name}</span>
                     </span>
                     <span className="font-medium text-white shrink-0">
-                      ${item.price.toFixed(2)}
+                      {formatCurrency(item.price)}
                     </span>
                   </div>
                 ))}
@@ -141,20 +141,20 @@ export default function PaymentDialog({
                   {tax != null && tax > 0 && (
                     <div className="flex items-center justify-between text-white">
                       <span>Tax</span>
-                      <span>${tax.toFixed(2)}</span>
+                      <span>{formatCurrency(tax)}</span>
                     </div>
                   )}
                   {shipping != null && shipping > 0 && (
                     <div className="flex items-center justify-between text-white">
                       <span>Shipping</span>
-                      <span>${shipping.toFixed(2)}</span>
+                      <span>{formatCurrency(shipping)}</span>
                     </div>
                   )}
                   {discount != null && discount > 0 && (
                     <div className="flex items-center justify-between text-white">
                       <span>Discount</span>
                       <span className="text-emerald-400">
-                        -${discount.toFixed(2)}
+                        -{formatCurrency(discount)}
                       </span>
                     </div>
                   )}
@@ -167,7 +167,7 @@ export default function PaymentDialog({
             <div className="flex items-center justify-between pt-1">
               <span className="font-semibold text-white">Total</span>
               <span className="text-xl font-semibold text-white">
-                ${amount.toFixed(2)}
+                {formatCurrency(amount)}
               </span>
             </div>
           </div>

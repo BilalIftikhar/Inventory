@@ -6,6 +6,7 @@
 "use client";
 
 import React from "react";
+import { formatCurrency } from "@/lib/utils";
 import { Column, ColumnDef } from "@tanstack/react-table";
 import { Invoice } from "@/types";
 import { Badge } from "@/components/ui/badge";
@@ -20,7 +21,6 @@ import { IoMdArrowDown, IoMdArrowUp } from "react-icons/io";
 import { format } from "date-fns";
 import Link from "next/link";
 import InvoiceActions from "./InvoiceActions";
-
 /**
  * Get invoice status badge color
  */
@@ -202,7 +202,7 @@ export const createInvoiceColumns = (
     cell: ({ getValue }) => {
       const total = getValue<number>();
       return (
-        <span className="font-semibold">${total.toFixed(2)}</span>
+        <span className="font-semibold">{formatCurrency(total)}</span>
       );
     },
   },
@@ -213,7 +213,7 @@ export const createInvoiceColumns = (
       const amountDue = getValue<number>();
       return (
         <span className={`font-semibold ${amountDue > 0 ? "text-red-600 dark:text-red-400" : "text-green-600 dark:text-green-400"}`}>
-          ${amountDue.toFixed(2)}
+          {formatCurrency(amountDue)}
         </span>
       );
     },
