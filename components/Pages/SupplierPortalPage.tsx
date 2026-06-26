@@ -329,7 +329,7 @@ export default function SupplierPortalPage() {
                   <YAxis />
                   <Tooltip
                     formatter={(value) => [
-                      formatCurrency(Number(value).toLocaleString()),
+                      formatCurrency(Number(value)),
                       "Revenue",
                     ]}
                   />

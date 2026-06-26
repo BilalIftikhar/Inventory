@@ -376,7 +376,7 @@ export default function ClientPortalPage() {
                   <YAxis />
                   <Tooltip
                     formatter={(value) => [
-                      formatCurrency(Number(value).toLocaleString()),
+                      formatCurrency(Number(value)),
                       "Spent",
                     ]}
                   />

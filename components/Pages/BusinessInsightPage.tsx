@@ -502,7 +502,7 @@ export default function BusinessInsightPage({
         {
           Section: "Key Metrics",
           Metric: "Total Value",
-          Value: formatCurrency(analyticsData.totalValue.toLocaleString()),
+          Value: formatCurrency(analyticsData.totalValue),
           "Additional Info": "",
         },
         {
@@ -588,7 +588,7 @@ export default function BusinessInsightPage({
         ...analyticsData.topProducts.map((product, index) => ({
           Section: "Top Products",
           Metric: product.name,
-          Value: formatCurrency(product.value.toLocaleString()),
+          Value: formatCurrency(product.value),
           "Additional Info": `Quantity: ${product.quantity}`,
         })),
 
@@ -647,7 +647,7 @@ export default function BusinessInsightPage({
         { Metric: "Total Products", Value: analyticsData.totalProducts },
         {
           Metric: "Total Value",
-          Value: formatCurrency(analyticsData.totalValue.toLocaleString()),
+          Value: formatCurrency(analyticsData.totalValue),
         },
         { Metric: "Low Stock Items", Value: analyticsData.lowStockItems },
         { Metric: "Out of Stock Items", Value: analyticsData.outOfStockItems },
@@ -935,7 +935,7 @@ export default function BusinessInsightPage({
                 <AnalyticsCard
                   title="Total Value"
                   value={formatCurrency(
-                    analyticsData.totalValue.toLocaleString(),
+                    analyticsData.totalValue,
                   )}
                   icon={DollarSign}
                   variant="emerald"
@@ -1211,7 +1211,7 @@ export default function BusinessInsightPage({
                           <Tooltip
                             formatter={(value) => [
                               value != null
-                                ? formatCurrency(Number(value).toLocaleString())
+                                ? formatCurrency(Number(value))
                                 : "$0",
                               "Value",
                             ]}
